@@ -1,8 +1,4 @@
-use std::{
-    fs,
-    io::{Error},
-    path::PathBuf,
-};
+use std::{fs, io::Error, path::PathBuf};
 
 pub fn get_image_paths(image_path: &str) -> Result<Vec<PathBuf>, Error> {
     let image_dir = fs::read_dir(image_path)?;
@@ -20,10 +16,11 @@ pub fn get_image_paths(image_path: &str) -> Result<Vec<PathBuf>, Error> {
 
 pub fn get_encoded_image_bytes(paths: &[PathBuf]) -> Result<Vec<Vec<u8>>, Error> {
     let encoded_image_bytes = paths
-    .iter()
-    .map(|path| {
-        let byte = fs::read(path)?;
-        Ok(byte)
-    }).collect();
+        .iter()
+        .map(|path| {
+            let byte = fs::read(path)?;
+            Ok(byte)
+        })
+        .collect();
     encoded_image_bytes
 }
