@@ -18,4 +18,12 @@ pub fn get_image_paths(image_path: &str) -> Result<Vec<PathBuf>, Error> {
     Ok(image_paths)
 }
 
-pub fn get_encoded_image_bytes() {}
+pub fn get_encoded_image_bytes(paths: &[PathBuf]) -> Result<Vec<Vec<u8>>, Error> {
+    let encoded_image_bytes = paths
+    .iter()
+    .map(|path| {
+        let byte = fs::read(path)?;
+        Ok(byte)
+    }).collect();
+    encoded_image_bytes
+}
