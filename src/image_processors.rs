@@ -1,5 +1,5 @@
 use std::io::Cursor;
-
+use rayon::prelude::*;
 use image::{ImageError, ImageReader, error::ImageFormatHint, imageops};
 
 pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ImageError> {
@@ -20,14 +20,24 @@ pub fn process_multiple_images<T>(encoded_image_arrays: &[T]) -> Result<Vec<Vec<
 where
     T: AsRef<[u8]> + Sync,
 {
-    let processed_images = encoded_image_arrays
+    encoded_image_arrays
         .iter()
         .map(|encoded_image_bytes| {
             let processed_image = process_single_image(encoded_image_bytes.as_ref())?;
             Ok(processed_image)
         })
-        .collect();
-    processed_images
+        .collect()
 }
 
-pub fn parallel_process_images() {}
+pub fn parallel_process_images<T>(encoded_image_arrays: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
+where
+    T: AsRef<[u8]> + Sync,
+{
+    encoded_image_arrays
+        .par_iter()
+        .map(|encoded_image_bytes: &T| {
+            let processed_image: Vec<u8> = process_single_image(encoded_image_bytes.as_ref())?;
+            Ok(processed_image)
+        })
+        .collect()
+}
