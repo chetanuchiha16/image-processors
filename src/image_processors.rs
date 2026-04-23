@@ -1,6 +1,6 @@
-use std::io::Cursor;
-use rayon::prelude::*;
 use image::{ImageError, ImageReader, error::ImageFormatHint, imageops};
+use rayon::prelude::*;
+use std::io::Cursor;
 
 pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ImageError> {
     let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
@@ -36,7 +36,8 @@ where
     encoded_image_bytes
         .par_iter()
         .map(|single_encoded_image_bytes: &T| {
-            let processed_image: Vec<u8> = process_single_image(single_encoded_image_bytes.as_ref())?;
+            let processed_image: Vec<u8> =
+                process_single_image(single_encoded_image_bytes.as_ref())?;
             Ok(processed_image)
         })
         .collect()

@@ -2,10 +2,13 @@ use crate::{
     get_image_bytes::{get_encoded_image_bytes, get_image_paths},
     image_processors::{parallel_process_images, process_multiple_images, process_single_image},
 };
-
+use tracing_subscriber::fmt::format::FmtSpan;
 mod get_image_bytes;
 mod image_processors;
-fn main() -> Result<(), Box<dyn std::error::Error>>{
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt()
+        .with_span_events(FmtSpan::CLOSE) // Logs when a function (span) finishes
+        .init();
     let cwd = std::env::current_dir()?;
     println!("The current directory is: {:?}", cwd);
     let image_paths = get_image_paths("./src/images")?;
