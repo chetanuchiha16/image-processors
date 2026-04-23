@@ -16,6 +16,18 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Image
     }
 }
 
-pub fn process_multiple_images() {}
+pub fn process_multiple_images<T>(encoded_image_arrays: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
+where
+    T: AsRef<[u8]> + Sync,
+{
+    let processed_images = encoded_image_arrays
+        .iter()
+        .map(|encoded_image_bytes| {
+            let processed_image = process_single_image(encoded_image_bytes.as_ref())?;
+            Ok(processed_image)
+        })
+        .collect();
+    processed_images
+}
 
 pub fn parallel_process_images() {}
