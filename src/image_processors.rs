@@ -16,27 +16,27 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Image
     }
 }
 
-pub fn process_multiple_images<T>(encoded_image_arrays: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
+pub fn process_multiple_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
 where
     T: AsRef<[u8]> + Sync,
 {
-    encoded_image_arrays
+    encoded_image_bytes
         .iter()
-        .map(|encoded_image_bytes| {
-            let processed_image = process_single_image(encoded_image_bytes.as_ref())?;
+        .map(|single_encoded_image_bytes| {
+            let processed_image = process_single_image(single_encoded_image_bytes.as_ref())?;
             Ok(processed_image)
         })
         .collect()
 }
 
-pub fn parallel_process_images<T>(encoded_image_arrays: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
+pub fn parallel_process_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
 where
     T: AsRef<[u8]> + Sync,
 {
-    encoded_image_arrays
+    encoded_image_bytes
         .par_iter()
-        .map(|encoded_image_bytes: &T| {
-            let processed_image: Vec<u8> = process_single_image(encoded_image_bytes.as_ref())?;
+        .map(|single_encoded_image_bytes: &T| {
+            let processed_image: Vec<u8> = process_single_image(single_encoded_image_bytes.as_ref())?;
             Ok(processed_image)
         })
         .collect()
