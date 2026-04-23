@@ -1,6 +1,7 @@
 use image::{ImageError, ImageReader, error::ImageFormatHint, imageops};
 use rayon::prelude::*;
 use std::io::Cursor;
+use tracing::instrument;
 
 pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ImageError> {
     let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
@@ -15,7 +16,7 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Image
         Err(ImageError::Unsupported(ImageFormatHint::Unknown.into()))
     }
 }
-
+#[instrument(level = "info", skip_all)]
 pub fn process_multiple_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
 where
     T: AsRef<[u8]> + Sync,
@@ -28,7 +29,7 @@ where
         })
         .collect()
 }
-
+#[instrument(level = "info", skip_all)]
 pub fn parallel_process_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
 where
     T: AsRef<[u8]> + Sync,

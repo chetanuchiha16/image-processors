@@ -1,6 +1,4 @@
 use std::{fs, io::Error, path::PathBuf};
-use tracing::instrument;
-#[instrument(level = "info", skip_all)]
 pub fn get_image_paths(image_path: &str) -> Result<Vec<PathBuf>, Error> {
     let image_dir = fs::read_dir(image_path)?;
     let image_paths = image_dir
@@ -14,7 +12,6 @@ pub fn get_image_paths(image_path: &str) -> Result<Vec<PathBuf>, Error> {
         .collect();
     Ok(image_paths)
 }
-#[instrument(level = "info", skip_all)]
 pub fn get_encoded_image_bytes(paths: &[PathBuf]) -> Result<Vec<Vec<u8>>, Error> {
     paths
         .iter()
