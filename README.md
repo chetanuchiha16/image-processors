@@ -32,7 +32,7 @@ image-processors/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Hinaverse/image-processors.git
+git clone https://github.com/chetanuchiha16/image-processors.git
 cd image-processors
 ```
 
