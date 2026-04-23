@@ -8,9 +8,9 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Image
 
     if let Some(image_format) = reader.format() {
         let image = reader.decode()?;
-        let resised_image = image.resize(224, 224, imageops::Lanczos3);
+        let resized_image = image.resize(224, 224, imageops::Lanczos3);
         let mut buffer = Cursor::new(Vec::new());
-        resised_image.write_to(&mut buffer, image_format)?;
+        resized_image.write_to(&mut buffer, image_format)?;
         Ok(buffer.into_inner())
     } else {
         Err(ImageError::Unsupported(ImageFormatHint::Unknown.into()))
@@ -19,7 +19,7 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Image
 #[instrument(level = "info", skip_all)]
 pub fn process_multiple_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
 where
-    T: AsRef<[u8]> + Sync,
+    T: AsRef<[u8]>,
 {
     encoded_image_bytes
         .iter()
