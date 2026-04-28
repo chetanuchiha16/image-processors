@@ -2,7 +2,7 @@ use image::{ImageError, ImageReader, error::ImageFormatHint, imageops};
 use rayon::prelude::*;
 use std::io::Cursor;
 use tracing::instrument;
-
+/// takes encoded bytes of a single image and processes it and returns encoded bytes of the processed image
 pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ImageError> {
     let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
 
