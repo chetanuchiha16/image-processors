@@ -4,7 +4,7 @@ use crate::{
     get_image_bytes::{get_encoded_image_bytes, get_image_paths},
     image_processors::{
         parallel_process_images, process_multiple_images, process_single_image,
-        process_single_image_raw,
+        process_single_image_nd_array,
     },
 };
 use clap::Parser;
@@ -33,7 +33,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_guessed_format()?
         .decode()?
         .save("src/images/op/single_image.jpg")?;
-    process_single_image_raw(&encoded_image_bytes[0])?;
+    process_single_image_nd_array(&encoded_image_bytes[0])?;
     process_multiple_images(&encoded_image_bytes)?;
     parallel_process_images(&encoded_image_bytes)?;
     println!("processed {} images", image_paths.len());
