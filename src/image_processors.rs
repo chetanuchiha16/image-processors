@@ -18,6 +18,17 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Image
 }
 
 #[instrument(level = "info", skip_all)]
+pub fn process_single_image_raw(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ImageError> {
+    let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
+    let image = reader.decode()?;
+
+    let resized_image = image.resize(224, 224, imageops::Lanczos3);
+    let raw_image_byte = resized_image.into_rgb8().into_raw();
+
+    Ok(raw_image_byte)
+}
+
+#[instrument(level = "info", skip_all)]
 pub fn process_multiple_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ImageError>
 where
     T: AsRef<[u8]>,
