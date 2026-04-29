@@ -484,6 +484,7 @@ dependencies = [
  "image",
  "ndarray",
  "rayon",
+ "thiserror",
  "tracing",
  "tracing-subscriber",
 ]
