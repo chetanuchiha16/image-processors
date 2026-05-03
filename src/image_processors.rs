@@ -1,7 +1,7 @@
 use image::{ImageError, ImageReader, error::ImageFormatHint, imageops};
 use ndarray::Array3;
 use rayon::prelude::*;
-use std::{io::Cursor};
+use std::io::Cursor;
 use tracing::instrument;
 
 #[derive(thiserror::Error, Debug)]
@@ -14,8 +14,6 @@ pub enum ProcessorError {
     Shape(#[from] ndarray::ShapeError),
 }
 
-
-
 /// takes encoded bytes of a single image and processes it and returns encoded bytes of the processed image
 pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ProcessorError> {
     let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
@@ -27,12 +25,16 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Proce
         resized_image.write_to(&mut buffer, image_format)?;
         Ok(buffer.into_inner())
     } else {
-        Err(ProcessorError::Image(ImageError::Unsupported(ImageFormatHint::Unknown.into())))
+        Err(ProcessorError::Image(ImageError::Unsupported(
+            ImageFormatHint::Unknown.into(),
+        )))
     }
 }
 
 #[instrument(level = "info", skip_all)]
-pub fn process_single_image_nd_array(encoded_image_bytes: &[u8]) -> Result<Array3<f32>, ProcessorError> {
+pub fn process_single_image_nd_array(
+    encoded_image_bytes: &[u8],
+) -> Result<Array3<f32>, ProcessorError> {
     let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
     let image = reader.decode()?;
 
@@ -46,29 +48,34 @@ pub fn process_single_image_nd_array(encoded_image_bytes: &[u8]) -> Result<Array
 }
 
 #[instrument(level = "info", skip_all)]
-pub fn process_multiple_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ProcessorError>
+pub fn process_multiple_images<T>(
+    encoded_image_bytes: &[T],
+) -> Result<Vec<Array3<f32>>, ProcessorError>
 where
     T: AsRef<[u8]>,
 {
     encoded_image_bytes
         .iter()
         .map(|single_encoded_image_bytes| {
-            let processed_image = process_single_image(single_encoded_image_bytes.as_ref())?;
+            let processed_image =
+                process_single_image_nd_array(single_encoded_image_bytes.as_ref())?;
             Ok(processed_image)
         })
         .collect()
 }
 
 #[instrument(level = "info", skip_all)]
-pub fn parallel_process_images<T>(encoded_image_bytes: &[T]) -> Result<Vec<Vec<u8>>, ProcessorError>
+pub fn parallel_process_images<T>(
+    encoded_image_bytes: &[T],
+) -> Result<Vec<Array3<f32>>, ProcessorError>
 where
     T: AsRef<[u8]> + Sync,
 {
     encoded_image_bytes
         .par_iter()
         .map(|single_encoded_image_bytes: &T| {
-            let processed_image: Vec<u8> =
-                process_single_image(single_encoded_image_bytes.as_ref())?;
+            let processed_image: Array3<f32> =
+                process_single_image_nd_array(single_encoded_image_bytes.as_ref())?;
             Ok(processed_image)
         })
         .collect()
