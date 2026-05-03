@@ -31,7 +31,6 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Proce
     }
 }
 
-#[instrument(level = "info", skip_all)]
 pub fn process_single_image_nd_array(
     encoded_image_bytes: &[u8],
 ) -> Result<Array3<f32>, ProcessorError> {
