@@ -22,7 +22,7 @@ mod image_processors_py {
     // We add the 'py: Python' argument so we can bind the new arrays to the Python GIL
     fn py_process_images<'py>(
         py: Python<'py>,
-        encoded_image_bytes: Vec<Vec<u8>>,
+        encoded_image_bytes: Vec<Bound<'py, PyBytes>>,
     ) -> PyResult<Vec<Bound<'py, PyArray3<f32>>>> {
         // 1. Call your internal Rust logic
         let rust_arrays: Vec<Array3<f32>> = process_multiple_images(&encoded_image_bytes)?;
@@ -46,7 +46,7 @@ mod image_processors_py {
 
         let py_arrays: Vec<Bound<'py, PyArray3<f32>>> = rust_arrays
             .into_iter()
-            .map(|arr| numpy::PyArray3::from_array(py, &arr))
+            .map(|arr| arr.into_pyarray(py))
             .collect();
 
         Ok(py_arrays)
