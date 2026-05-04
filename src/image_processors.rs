@@ -18,17 +18,17 @@ pub enum ProcessorError {
 pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ProcessorError> {
     let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
 
-    if let Some(image_format) = reader.format() {
-        let image = reader.decode()?;
-        let resized_image = image.resize(224, 224, imageops::Lanczos3);
-        let mut buffer = Cursor::new(Vec::new());
-        resized_image.write_to(&mut buffer, image_format)?;
-        Ok(buffer.into_inner())
-    } else {
-        Err(ProcessorError::Image(ImageError::Unsupported(
-            ImageFormatHint::Unknown.into(),
-        )))
-    }
+    // if let Some(image_format) =
+    let image_format = reader.format().ok_or_else(|| {
+        ProcessorError::Image(ImageError::Unsupported(ImageFormatHint::Unknown.into()))
+    })?;
+
+    let image = reader.decode()?;
+
+    let resized_image = image.resize_exact(224, 224, imageops::Lanczos3);
+    let mut buffer = Cursor::new(Vec::new());
+    resized_image.write_to(&mut buffer, image_format)?;
+    Ok(buffer.into_inner())
 }
 
 pub fn process_single_image_nd_array(
