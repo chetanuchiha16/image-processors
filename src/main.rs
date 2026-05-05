@@ -28,7 +28,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     let image_paths = get_image_paths(&args.path)?;
     let encoded_image_bytes = get_encoded_image_bytes(&image_paths)?;
-    let single_processed_image = process_single_image(&encoded_image_bytes[0])?;
+    let first_image = encoded_image_bytes
+        .first()
+        .ok_or_else(|| "No images found in this dir")?;
+    let single_processed_image = process_single_image(first_image)?;
     image::ImageReader::new(Cursor::new(single_processed_image))
         .with_guessed_format()?
         .decode()?
