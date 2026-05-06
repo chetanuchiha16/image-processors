@@ -18,8 +18,14 @@ mod image_processors_py {
 
     use crate::image_processors::{parallel_process_images, process_multiple_images};
 
+    /// Processes a list of images into NumPy arrays sequentially.
+    ///
+    /// # Arguments
+    /// * `encoded_image_bytes` - A list of Python bytes objects.
+    ///
+    /// # Returns
+    /// * `PyResult<Vec<PyArray3<f32>>>` - A list of 3D NumPy arrays.
     #[pyfunction]
-    // We add the 'py: Python' argument so we can bind the new arrays to the Python GIL
     fn py_process_images<'py>(
         py: Python<'py>,
         encoded_image_bytes: Vec<Bound<'py, PyBytes>>,
@@ -36,6 +42,13 @@ mod image_processors_py {
         Ok(py_arrays)
     }
 
+    /// Processes a list of images into NumPy arrays in parallel using Rust threads.
+    ///
+    /// # Arguments
+    /// * `encoded_image_bytes` - A list of Python bytes objects.
+    ///
+    /// # Returns
+    /// * `PyResult<Vec<PyArray3<f32>>>` - A list of 3D NumPy arrays.
     #[pyfunction]
     fn py_parallel_process_images<'py>(
         py: Python<'py>,

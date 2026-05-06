@@ -4,6 +4,7 @@ use rayon::prelude::*;
 use std::io::Cursor;
 use tracing::instrument;
 
+/// Custom error type for image processing operations.
 #[derive(thiserror::Error, Debug)]
 pub enum ProcessorError {
     #[error("IO error: {0}")]
@@ -14,7 +15,14 @@ pub enum ProcessorError {
     Shape(#[from] ndarray::ShapeError),
 }
 
-/// takes encoded bytes of a single image and processes it and returns encoded bytes of the processed image
+/// Processes a single image from raw bytes: decodes, resizes to 224x224, and re-encodes.
+///
+/// # Arguments
+/// * `encoded_image_bytes` - Raw bytes of the image to process.
+///
+/// # Returns
+/// * `Result<Vec<u8>, ProcessorError>` - The processed image bytes in its original format,
+///   or a processing error.
 pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, ProcessorError> {
     let reader = ImageReader::new(Cursor::new(encoded_image_bytes)).with_guessed_format()?;
 
@@ -31,6 +39,15 @@ pub fn process_single_image(encoded_image_bytes: &[u8]) -> Result<Vec<u8>, Proce
     Ok(buffer.into_inner())
 }
 
+/// Processes a single image and returns it as a 3D ndarray (H, W, C) with normalized f32 values.
+///
+/// The image is resized to 224x224 using Lanczos3 interpolation.
+///
+/// # Arguments
+/// * `encoded_image_bytes` - Raw bytes of the image to process.
+///
+/// # Returns
+/// * `Result<Array3<f32>, ProcessorError>` - A normalized ndarray (0.0 to 1.0), or a processing error.
 pub fn process_single_image_nd_array(
     encoded_image_bytes: &[u8],
 ) -> Result<Array3<f32>, ProcessorError> {
@@ -46,6 +63,13 @@ pub fn process_single_image_nd_array(
     Ok(nd_array)
 }
 
+/// Processes a batch of images sequentially into a vector of normalized ndarrays.
+///
+/// # Arguments
+/// * `encoded_image_bytes` - A slice of objects that can be converted to byte slices.
+///
+/// # Returns
+/// * `Result<Vec<Array3<f32>>, ProcessorError>` - A vector of normalized ndarrays.
 #[instrument(level = "info", skip_all)]
 pub fn process_multiple_images<T>(
     encoded_image_bytes: &[T],
@@ -63,6 +87,13 @@ where
         .collect()
 }
 
+/// Processes a batch of images in parallel using Rayon into a vector of normalized ndarrays.
+///
+/// # Arguments
+/// * `encoded_image_bytes` - A slice of objects that can be converted to byte slices.
+///
+/// # Returns
+/// * `Result<Vec<Array3<f32>>, ProcessorError>` - A vector of normalized ndarrays.
 #[instrument(level = "info", skip_all)]
 pub fn parallel_process_images<T>(
     encoded_image_bytes: &[T],
