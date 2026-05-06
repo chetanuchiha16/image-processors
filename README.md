@@ -1,10 +1,10 @@
-# 🖼️ Image Processors
+# 🖼️ IrisBridge
 
-A high-performance image processing library written in Rust, featuring both sequential and parallel batch processing capabilities. Now with **Python bindings** via PyO3, allowing you to process images in Rust and receive them as **NumPy arrays** in Python.
+A high-performance image processing library written in Rust, featuring both sequential and parallel batch processing capabilities. Built as a part of the **Hinaverse**, IrisBridge provides a seamless **Python bridge** via PyO3, allowing you to process images in Rust and receive them as **NumPy arrays** in Python.
 
 ## Features
 
-- **Python Integration** — Seamlessly call high-performance Rust processing from Python.
+- **Python Integration** — Seamlessly call high-performance Rust processing from Python using `iris_bridge_py`.
 - **NumPy Support** — Returns images as normalized 3D ndarrays (H, W, C) ready for ML models.
 - **Parallel Processing** — Leverage all available CPU cores via Rayon's `par_iter` for significant throughput gains on large batches.
 - **Batch Processing** — Process a collection of images sequentially with efficient iterator chaining.
@@ -15,7 +15,7 @@ A high-performance image processing library written in Rust, featuring both sequ
 ## Project Structure
 
 ```
-image-processors/
+iris-bridge/
 ├── Cargo.toml
 ├── src/
 │   ├── lib.rs                  # Python module entry point & library root
@@ -53,7 +53,7 @@ maturin develop
 
 ### 2. Usage in Python
 ```python
-import image_processors_py
+import iris_bridge_py
 import numpy as np
 
 # List of image bytes
@@ -61,7 +61,7 @@ images = [open("img1.jpg", "rb").read(), open("img2.png", "rb").read()]
 
 # Process in parallel
 # Returns a list of numpy arrays (shape: [224, 224, 3], dtype: float32)
-batch = image_processors_py.py_parallel_process_images(images)
+batch = iris_bridge_py.py_parallel_process_images(images)
 
 print(f"Processed {len(batch)} images. First image shape: {batch[0].shape}")
 ```
@@ -81,7 +81,8 @@ print(f"Processed {len(batch)} images. First image shape: {batch[0].shape}")
 |---|---|---|
 | `process_single_image` | `(bytes: &[u8]) -> Result<Vec<u8>, Error>` | Decodes, resizes to 224×224, and re-encodes. |
 | `process_single_image_nd_array` | `(bytes: &[u8]) -> Result<Array3<f32>, Error>` | Returns a normalized 224×224×3 ndarray. |
-| `parallel_process_images` | `(bytes: &[T]) -> Result<Vec<Array3<f32>>, Error>` | Batch parallel processing via Rayon. |
+| `process_multiple_images` | `(bytes: &[T]) -> Result<Vec<Array3<f32>>, Error>` | Batch sequential processing into ndarrays. |
+| `parallel_process_images` | `(bytes: &[T]) -> Result<Vec<Array3<f32>>, Error>` | Batch parallel processing into ndarrays via Rayon. |
 
 ## Dependencies
 

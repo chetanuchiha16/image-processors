@@ -1,14 +1,14 @@
 [package]
-name = "image-processors"
+name = "iris-bridge"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "image_processors_py"
+name = "iris_bridge_py"
 crate-type = ["cdylib", "rlib"]
 
 [[bin]]
-name = "image-processors"
+name = "iris-bridge"
 path = "src/main.rs"
 
 [dependencies]

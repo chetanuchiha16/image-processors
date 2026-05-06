@@ -11,7 +11,7 @@ impl From<ProcessorError> for PyErr {
 }
 /// A Python module implemented in Rust.
 #[pymodule]
-mod image_processors_py {
+mod iris_bridge_py {
     use ndarray::Array3;
     use numpy::{IntoPyArray, PyArray3};
     use pyo3::{prelude::*, types::PyBytes};
