@@ -1,4 +1,4 @@
-import image_processors_py as ip
+import iris_bridge_py as ip
 from pathlib import Path
 import time
 
